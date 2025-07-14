@@ -184,7 +184,6 @@ class multi_linear_regressor():
         for i in range(m):
             loss = (self.predict(X_train[i]) - y_train[i])**2
             cost += loss/(2*m)
-        # print(cost)
         return cost
 
     def gradient_descent(self, X_train:np.ndarray, y_train:np.ndarray, 
