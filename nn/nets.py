@@ -1,13 +1,17 @@
 import numpy as np
-from layers import Layer
+from nn.layers import Layer
+from nn.cost_functions import *
 import math
 
 SEED = 12345
 np.random.seed(SEED)
 
 class Net():
-    def __init__(self, layers:list[Layer]):
+    def __init__(self, layers:list[Layer], cost_function:cost_function=MSE):
         self.layers = layers
+        self.cost_function = cost_function
+
+        #initializing weights
         for i in range(1, len(layers)):
             prev_units = layers[i-1].units
             layers[i].init_weights(prev_units)
@@ -15,7 +19,7 @@ class Net():
     def predict(self, X:np.ndarray):
         """ Forward through all layers
         X = [[1, 2, 3],  # x_0
-            [4, 5, 6],] # x_1 or x_m
+             [4, 5, 6],] # x_1 or x_m
 
         Args:
             X shape=(m, n): X_train basically
@@ -44,12 +48,8 @@ class Net():
             J_wb (int): cost
         """
 
-        m = X_train.shape[0]
-        Y_hat = self.predict(X_train)
-
-        C = (1/(2*m))*((Y_hat - Y_train)**2)
-        c_per_ex = np.sum(C, axis=1) # cost per example
-        cost = np.sum(c_per_ex) # overall cost
+        Y_pred = self.predict(X_train)
+        cost = self.cost_function.apply(Y_pred, Y_train)
         return cost
     
     def gradient_descent(self, X_train:np.ndarray, y_train:np.ndarray, 
@@ -57,15 +57,13 @@ class Net():
         J_history = []
 
         for i in range(num_iters):
-            dj_dw_list, dj_db_list = self.compute_gradient(X_train, y_train)
+            self.backpropagation
 
-            self.update_params(dj_dw_list, dj_db_list, alpha)
-
-            if i<100000:      # prevent resource exhaustion 
+            if i<1000:      # prevent resource exhaustion 
                 J_history.append(self.compute_cost(X_train, y_train))
 
             # Print cost every at intervals 20 times or as many iterations if < 20
-            if i% math.ceil(num_iters / 20) == 0:
+            if i% math.ceil(num_iters / 10) == 0:
                 print(f"Iteration {i:9d}: Cost {J_history[-1]:8.6f}")
         
         return J_history #return final w,b and J history for graphing

@@ -1,4 +1,5 @@
 import numpy as np
+from nn.activation_functions import activation_f, linear
 
 class Layer():
     def __init__(self, units:int):
@@ -7,15 +8,18 @@ class Layer():
     def __call__(self, X:np.ndarray) -> np.ndarray:
         pass
 
-    def init_weights(self):
+    def init_weights(self, prev_units:int):
         pass
 
 class Dense(Layer):
-    def __init__(self, units:int, activation:function):
-        super.__init__(units)
+    def __init__(self, units:int, activation:activation_f=linear):
+        super().__init__(units)
         self.activation = activation
         self.W:np.ndarray = None
         self.b = np.zeros((units))
+
+        self.dJ_dw = None
+        self.dJ_db = None
 
     def init_weights(self, prev_units:int):
         self.W = np.random.rand(prev_units, self.units) - 0.5
@@ -34,7 +38,7 @@ class Dense(Layer):
             A shape=(m, W.shape[1])
         """
         Z = np.matmul(A_in, self.W) + self.b
-        A = self.activation(Z)
+        A = self.activation.apply(Z)
         return A
     
     def compute_gradient(self, A_actual, A_pred):
@@ -52,12 +56,9 @@ class Dense(Layer):
         dj_dw = A_actual*(self.predict(A_actual) - A_pred)/m
         dj_db = (self.predict(A_actual) - A_pred)/m
 
-
-
-
-
-
+    def updata_params():
+        pass
 
 class InLayer(Layer):
-    def __call__(self, X:np.ndarray):
+    def __call__(self, X):
         return X
