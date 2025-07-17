@@ -22,6 +22,10 @@ class sigmoid(activation_f):
     def apply(Z:np.ndarray) -> np.ndarray:
         return 1/(1 + np.exp(-Z))
     
+    @staticmethod
+    def prime(Z:np.ndarray, A:np.ndarray) -> np.ndarray:
+        return A * (1 - A)
+    
 class linear(activation_f):
     @staticmethod
     def apply(Z:np.ndarray) -> np.ndarray:
@@ -47,4 +51,8 @@ class softmax(activation_f):
     
     @staticmethod
     def prime(Z:np.ndarray, A:np.ndarray) -> np.ndarray:
-        return A*(1-A)
+        # When combined with CrossEntropyLoss, the derivative of the cost with respect
+        # to Z is simply (A - Y_train). The cost function's prime method already
+        # computes this. By returning 1 here, we ensure that the layer's
+        # gradient update step uses that value directly.
+        return 1
