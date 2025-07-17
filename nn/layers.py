@@ -6,10 +6,13 @@ class Layer():
         self.units = units
 
     def __call__(self, X:np.ndarray) -> np.ndarray:
-        pass
+        return None
 
     def init_weights(self, prev_units:int):
-        pass
+        return None
+
+    def gradient_and_update(self, dJ_dA:np.ndarray, m:int, alpha:float):
+        return dJ_dA
 
 class Dense(Layer):
     def __init__(self, units:int, activation:activation_f=linear):
@@ -24,7 +27,7 @@ class Dense(Layer):
     def init_weights(self, prev_units:int):
         self.W = np.random.rand(prev_units, self.units) - 0.5
 
-    def __call__(self, A_in:np.ndarray) -> np.ndarray:
+    def __call__(self, A_in:np.ndarray, save:bool=False) -> np.ndarray:
         """Forward
 
         A_in = [[1, 2, 3],  # a_0
@@ -39,9 +42,15 @@ class Dense(Layer):
         """
         Z = np.matmul(A_in, self.W) + self.b
         A = self.activation.apply(Z)
+
+        if save:
+            self.Z = Z
+            self.A_prev = A_in
+            self.A = A
+
         return A
     
-    def compute_gradient(self, A_actual, A_pred):
+    def gradient_and_update(self, dJ_dA:np.ndarray, m:int, alpha:float):
         """_summary_
 
         Args:
@@ -49,16 +58,23 @@ class Dense(Layer):
             y_pred (m, self.units): _description_
         """
 
-        m = A_actual.shape[0]
-        dj_dw = np.zeros_like(self.weights)
-        dj_db = 0
+        dA_dZ = self.activation.prime(Z = self.Z, A = self.A)
+        dJ_dZ = np.multiply(dA_dZ, dJ_dA) # m times
 
-        dj_dw = A_actual*(self.predict(A_actual) - A_pred)/m
-        dj_db = (self.predict(A_actual) - A_pred)/m
+        dJ_db = dJ_dZ
+        dJ_db = np.sum(dJ_db, axis=0)/m
 
-    def updata_params():
-        pass
+        dJ_dW = np.matmul(self.A_prev.T, dJ_dZ)/m
+        self.update_params(dJ_dW, dJ_db, alpha)
+
+        dJ_dA_prev = np.matmul(dJ_dZ, self.W.T)
+
+        return dJ_dA_prev
+
+    def update_params(self, dJ_dW:np.ndarray, dJ_db:np.ndarray, alpha:float):
+        self.W -= alpha*dJ_dW
+        self.b -= alpha*dJ_db
 
 class InLayer(Layer):
-    def __call__(self, X):
+    def __call__(self, X:np.ndarray, save:bool):
         return X
