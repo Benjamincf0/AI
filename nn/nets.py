@@ -76,10 +76,10 @@ class Net():
                 Y_pred = self.predict(X_train[j:j+batch_size], save=True)
                 self.backprop(Y_pred, Y_train[j:j+batch_size], alpha)
             # Print cost every at intervals 20 times or as many iterations if < 20
-            if i% math.ceil(epochs / 100) == 0 or i == epochs - 1:
+            if i% math.ceil(epochs / 60) == 0 or i == epochs - 1:
                 J_history.append(self.compute_cost(X_train, Y_train))
             
-            if i% math.ceil(epochs / 10) == 0 or i == epochs - 1:
+            if i% math.ceil(epochs / 6) == 0 or i == epochs - 1:
                 print(f"Epoch {i:9d}: Cost {J_history[-1]:8.6f}")
         
         return J_history #return final w,b and J history for graphing
@@ -91,7 +91,7 @@ class Net():
         for layer in self.layers[::-1]:
             dJ_da_prev = layer.gradient_and_update(dJ_da_prev, m, alpha)
 
-    def save_model(self, filepath:str='nn/model.npz'):
+    def save_model(self, filepath):
         """saves model weights and biases to a file,
         along with names of activation functions, # of units per layer, and cost function name
         """
