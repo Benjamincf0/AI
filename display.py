@@ -11,8 +11,10 @@ class grid():
     def __init__(self, shape:tuple[int, int], display_shape:tuple[int, int], topleft:tuple[int, int]):
         self._shape = shape
         self.grid = np.zeros(shape)
+        self.grid_processed = np.zeros(shape)
         self.display_shape = display_shape
         self.topleft = topleft
+        self.point_list = []
 
     def add_point(self, real_pos:tuple[int, int]):
         # Convert real (screen) position to grid coordinates
@@ -20,18 +22,66 @@ class grid():
         grid_y = (real_pos[1] - self.topleft[1]) * (self._shape[1] / self.display_shape[1])
 
         if 0 <= grid_x < self._shape[0] and 0 <= grid_y < self._shape[1]:
-            # Create meshgrid of coordinates
-            x_indices, y_indices = np.indices(self._shape)
-            
-            # Compute squared Euclidean distance from the clicked point
-            dist_sq = (x_indices - grid_x) ** 2 + (y_indices - grid_y) ** 2
 
-            # Example: apply Gaussian brightness falloff
-            sigma = 0.65  # adjust for spread
-            brightness = np.exp(-dist_sq / (2 * sigma ** 2))
+            self.point_list.append([grid_x, grid_y])
 
-            # Add to existing grid, clip to max brightness of 1
-            self.grid = np.clip(self.grid + brightness, 0, 1)
+    def render_grids(self):
+        def render_grid(grid:np.ndarray, point_list:list, shape:tuple):
+                grid = np.zeros(shape)
+                for [grid_x, grid_y] in point_list:
+                    # Create meshgrid of coordinates
+                    x_indices, y_indices = np.indices(shape)
+                    
+                    # Compute squared Euclidean distance from the clicked point
+                    dist_sq = (x_indices - grid_x) ** 2 + (y_indices - grid_y) ** 2
+
+                    # Example: apply Gaussian brightness falloff
+                    sigma = 0.65  # adjust for spread
+                    brightness = np.exp(-dist_sq / (2 * sigma ** 2))
+
+                    # Add to existing grid, clip to max brightness of 1
+                    return np.clip(grid + brightness, 0, 1)
+                
+        self.grid = render_grid(self.grid, self.point_list, self._shape)
+
+        
+    def process_grid_coords(self):
+
+        # Convert to NumPy array for easier manipulation
+        coords_array = np.array(self.point_list)
+
+        # Calculate the center of mass (average)
+        center_of_mass = np.mean(coords_array, axis=0)
+
+        # Compute the required displacement
+        displacement = [14 - coord for coord in center_of_mass]
+
+        # Translate by the displacement vector
+        translated_coords = coords_array + displacement
+
+        # Get the min and max values in each axis
+        min_x, max_x = np.min(translated_coords[:, 0]), np.max(translated_coords[:, 0])
+        min_y, max_y = np.min(translated_coords[:, 1]), np.max(translated_coords[:, 1])
+
+        # Calculate the current size in each axis
+        size_x, size_y = max_x - min_x, max_y - min_y
+
+        # Calculate the desired size in each axis
+        desired_size_x = max(4, size_x)
+        desired_size_y = max(4, size_y)
+
+        # Calculate the scale factor for each axis
+        scale_factor_x = desired_size_x / size_x
+        scale_factor_y = desired_size_y / size_y
+
+        scale_factor = min(scale_factor_x, scale_factor_y)
+
+        # Apply scaling to translated coordinates
+        scaled_coords = translated_coords * scale_factor
+
+        print("Scaled Coordinates:")
+        for coord in scaled_coords:
+            print(coord)
 
     def draw_grid(self, screen):
         cell_w = int(round(self.display_shape[0]/self._shape[0]))
@@ -43,14 +93,19 @@ class grid():
                 color = (val, val, val)
                 pygame.draw.rect(screen, color, rect)
                 pygame.draw.rect(screen, (200, 200, 200), rect, 1)  # Grid lines
- 
+
+    def clear_grids(self):
+        self.grid = np.zeros(self._shape)
+        self.grid_processed = np.zeros(self._shape)
+        self.point_list = []
+    
 class App:
     def __init__(self):
         self._running = True
         self._display_surf = None
         self.size = self.width, self.height = 720, 400
         self.grid = grid(shape=(28, 28), display_shape=(300, 300), topleft=(20, 20))
-        self.net = Net.load_model('nn/model.npz')
+        self.net = Net.load_model('classification_models/3h.npz')
         self.clock = pygame.time.Clock()
  
     def on_init(self):
@@ -59,8 +114,6 @@ class App:
         self._running = True
         self.grid.draw_grid(self._display_surf)
         
-        
- 
     def on_event(self, event):
         if event.type == pygame.QUIT:
             self._running = False
@@ -68,10 +121,11 @@ class App:
             or (event.type == pygame.MOUSEMOTION and pygame.mouse.get_pressed()[0])):
             pos = pygame.mouse.get_pos()
             self.grid.add_point(pos)
+            self.grid.render_grids()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:  # replace with any key
                 print("Space key pressed")
-                self.grid.grid = np.zeros(self.grid._shape)
+                self.grid.clear_grids()
 
     def on_loop(self):
         pass

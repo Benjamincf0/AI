@@ -67,9 +67,9 @@ class Net():
         return num_correct / m
     
     def gradient_descent(self, X_train:np.ndarray, Y_train:np.ndarray, 
-                         alpha:float=1e-8,epochs:int=20, batch_size:int=100):
+                         alpha:float=1e-8,epochs:int=20, batch_size:int=100, verbose=True):
         J_history = [self.compute_cost(X_train, Y_train)]
-        print(f"Initial cost   : Cost {J_history[-1]:8.6f}")
+        if verbose: print(f"Initial cost   : Cost {J_history[-1]:8.6f}")
 
         for i in range(epochs):
             for j in range(0, X_train.shape[0], batch_size):
@@ -79,7 +79,10 @@ class Net():
             if i% math.ceil(epochs / 60) == 0 or i == epochs - 1:
                 J_history.append(self.compute_cost(X_train, Y_train))
             
-            if i% math.ceil(epochs / 6) == 0 or i == epochs - 1:
+            if (i% math.ceil(epochs / 6) == 0 or i == epochs - 1) and verbose:
+                print(f"Epoch {i:9d}: Cost {J_history[-1]:8.6f}")
+
+            if not verbose and i == epochs - 1:
                 print(f"Epoch {i:9d}: Cost {J_history[-1]:8.6f}")
         
         return J_history #return final w,b and J history for graphing
