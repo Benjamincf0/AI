@@ -1,79 +1,115 @@
-# Neural Network Digit Recognition from Scratch
+# Neural Network From Scratch: Handwritten Digit Recognition
 
-A Python implementation of a neural network for handwritten digit recognition, built from scratch using NumPy. Features a real-time drawing interface for testing predictions.
+A comprehensive neural network library built entirely from scratch using NumPy. This project implements backpropagation, gradient descent, and various activation functions to create a deep learning system capable of recognizing handwritten digits with ~96% accuracy.
 
 ![Demo](assets/demo.gif)
 
-## Features
+## Core Features
 
-- 🧠 Custom neural network implementation from scratch
-- 🎨 Interactive drawing interface using Pygame
-- 📊 Real-time probability distribution visualization
-- 🔄 Live digit prediction as you draw
+### Neural Network Library
+All core components implemented from scratch:
+- 🧮 Backpropagation algorithm
+- 📉 Mini-batch gradient descent
+- 🔢 Multiple layer types (Dense, Input)
+- ⚡ Activation functions (ReLU, Sigmoid, Softmax)
+- 📊 Cost functions (MSE, Cross-entropy)
+- 💾 Model saving and loading capabilities
+
+### Interactive Demo
+- 🎨 Real-time digit recognition interface
 - 📐 Automatic input preprocessing and normalization
+- 📊 Live probability distribution visualization
+- 🔄 Instant predictions as you draw
 
-## Demo
+## Technical Implementation
 
-### Live Prediction
-The application provides real-time feedback as you draw:
-- Left panel: Your drawing
-- Bottom panel: Preprocessed input (normalized 28x28)
-- Right panel: Probability distribution for each digit
-- Bottom right: Final prediction
+### Architecture
+The network achieves 96% accuracy using a 3 hidden layer model:
+```python
+net = Net([
+    InLayer(units=784),               # Flattened 28x28 input
+    Dense(units=20, activation=ReLU), # Hidden layer 1
+    Dense(units=15, activation=ReLU), # Hidden layer 2
+    Dense(units=15, activation=ReLU), # Hidden layer 3
+    Dense(units=10, activation=softmax) # Output layer
+], cost_function=CrossEntropyLoss)
+```
 
-![Interface Screenshot](assets/interface.png)
+### Key Components
+- **Backpropagation**: Custom implementation of the chain rule to compute gradients
+- **Gradient Descent**: Mini-batch optimization with configurable learning rate and batch size
+- **Activation Functions**: 
+  - ReLU: `max(0, x)` for hidden layers
+  - Softmax: For output layer probability distribution
+- **Loss Function**: Cross-entropy loss for multi-class classification
 
-## Technical Details
-
-### Neural Network Architecture
-- Input layer: 784 neurons (28x28 flattened image)
-- Hidden layers: 3 layers with ReLU activation
-  - Layer 1: 20 neurons
-  - Layer 2: 15 neurons
-  - Layer 3: 15 neurons
-- Output layer: 10 neurons with Softmax activation
-- Loss function: Cross-entropy
-
-### Performance
-- Training accuracy: ~98%
-- Test accuracy: ~97%
-- Dataset: MNIST handwritten digits
+## Performance
+- Training accuracy: ~98.5%
+- Test accuracy: ~95.7%
+- Dataset: MNIST handwritten digits (60,000 training, 10,000 test images)
 
 ## Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/neural-network-digits.git
+git clone https://github.com/Benjamincf0/AI.git
 
 # Install dependencies
-pip install numpy pygame
+conda create --name ai_project --file requirements.txt
 
-# Run the drawing interface
+# Run the interactive demo
 python display.py
 ```
 
 ## Usage
 
-1. Run `display.py` to launch the drawing interface
+### Interactive Demo
+1. Run `python display.py`
 2. Draw a digit using your mouse
-3. Watch the real-time prediction
-4. Press SPACE to clear the canvas
-5. Close the window to exit
+3. Watch real-time predictions
+4. Press **SPACE** to clear
+5. Click the **X** to exit
 
-## Implementation Details
+### Training Your Own Model
+```python
+from nn.nets import Net
+from nn.layers import Dense, InLayer
+from nn.activation_functions import ReLU, softmax
+from nn.cost_functions import CrossEntropyLoss
 
-The project consists of several key components:
+# Create model
+net = Net([
+    InLayer(units=784),
+    Dense(units=20, activation=ReLU),
+    Dense(units=10, activation=softmax),
+], cost_function=CrossEntropyLoss)
 
-- `nn/nets.py`: Neural network implementation
-- `nn/layers.py`: Layer abstractions (Dense, Input)
-- `nn/activation_functions.py`: ReLU, Sigmoid, Softmax
-- `nn/cost_functions.py`: MSE and Cross-entropy implementations
-- `display.py`: Interactive drawing interface
+# Get training data
+X_train, Y_train = ...
 
-## Contributing
+# Train
+net.gradient_descent(X_train, Y_train, 
+                    alpha=0.0005,
+                    epochs=3000, 
+                    batch_size=256)
 
-Feel free to open issues and pull requests for improvements!
+# Save model
+net.save_model('my_model.npz')
+```
+
+## Project Structure
+```
+nn/
+├── nets.py    # Neural network implementation
+├── layers.py  # Layer abstractions
+├── activation_functions.py
+└── cost_functions.py
+```
 
 ## License
 
-MIT License - feel free to use this code for your own projects!
+MIT License - Feel free to use and modify!
+
+## Contributing
+
+Contributions are welcome! Feel free to open issues and pull requests.
