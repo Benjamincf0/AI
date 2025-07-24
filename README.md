@@ -99,6 +99,7 @@ net.save_model('my_model.npz')
 
 ## Project Structure
 ```
+nn.ipynb
 nn/
 ├── nets.py    # Neural network implementation
 ├── layers.py  # Layer abstractions
