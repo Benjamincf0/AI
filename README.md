@@ -8,18 +8,18 @@ A comprehensive neural network library built entirely from scratch using NumPy. 
 
 ### Neural Network Library
 All core components implemented from scratch:
-- 🧮 Backpropagation algorithm
-- 📉 Mini-batch gradient descent
-- 🔢 Multiple layer types (Dense, Input)
-- ⚡ Activation functions (ReLU, Sigmoid, Softmax)
-- 📊 Cost functions (MSE, Cross-entropy)
-- 💾 Model saving and loading capabilities
+-  Backpropagation algorithm
+-  Mini-batch gradient descent
+-  Multiple layer types (Dense, Input)
+-  Activation functions (ReLU, Sigmoid, Softmax)
+-  Cost functions (MSE, Cross-entropy)
+-  Model saving and loading capabilities
 
 ### Interactive Demo
-- 🎨 Real-time digit recognition interface
-- 📐 Automatic input preprocessing and normalization
-- 📊 Live probability distribution visualization
-- 🔄 Instant predictions as you draw
+-  Real-time digit recognition interface
+-  Automatic input preprocessing and normalization
+-  Live probability distribution visualization
+-  Instant predictions as you draw
 
 ## Technical Implementation
 
