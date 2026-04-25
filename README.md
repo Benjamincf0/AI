@@ -1,6 +1,6 @@
 # Neural Network From Scratch: Handwritten Digit Recognition
 
-A comprehensive neural network library built entirely from scratch using NumPy. This project implements backpropagation, gradient descent, and various activation functions to create a deep learning system capable of recognizing handwritten digits with ~96% accuracy.
+A neural network library built entirely from scratch using NumPy. This project implements backpropagation, gradient descent, and various activation functions to create a deep learning system capable of recognizing handwritten digits with ~96% accuracy.
 
 ![Demo](assets/demo.gif)
 
